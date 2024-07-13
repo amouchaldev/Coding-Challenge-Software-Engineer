@@ -21,7 +21,7 @@ This app efficiently manages products and categories, focusing on clean architec
 
 1. **Clone the repository:**
     ```
-    git clone https://github.com/your/repository.git
+    git clone https://github.com/amouchaldev/Coding-Challenge-Software-Engineer.git
     ```
     
 3. **Install dependencies:**
@@ -59,7 +59,7 @@ This app efficiently manages products and categories, focusing on clean architec
 
 ## Testing
 
-Ensure product creation functionality through automated tests:
+- Ensure product creation functionality through automated tests:
 
   ```
     php artisan test 
@@ -69,16 +69,18 @@ Ensure product creation functionality through automated tests:
 
 ### Start the Development Server
 
-Run the following command to start the Laravel development server:
+- Run the following command to start the Laravel development server:
 
-```
-php artisan serve
-```
+    ```
+    php artisan serve
+    ```
 
-1. Access the application via your web browser.
-2. Utilize the interface for listing or creating products.
+    1. Access the application via your web browser.
+    2. Utilize the interface for listing or creating products.
+
 
 ### Command Line Interface (CLI)
+- create product via  cli
 
    ```
    php artisan product:create
