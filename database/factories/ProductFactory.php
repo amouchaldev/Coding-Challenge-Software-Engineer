@@ -1,0 +1,23 @@
+<?php
+
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+class ProductFactory extends Factory
+{    
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            'name' => $this->faker->sentence(rand(4, 6)),
+            'description' => $this->faker->paragraph(1),
+            'price' => $this->faker->randomFloat(),
+            'image' => 'products/default.png'
+        ];
+    }
+}

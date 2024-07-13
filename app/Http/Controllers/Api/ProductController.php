@@ -54,7 +54,7 @@ class ProductController extends Controller
         try {
             $validated = $request->validated();
 
-            if (!is_array($validated['categories'])) {
+            if (isset($validated['categories']) && !is_array($validated['categories'])) {
                 $validated['categories'] = explode(',', $validated['categories']);
             }
 
