@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class ProductController extends Controller
-{    
+{
     /**
      * index
      *
@@ -34,7 +34,6 @@ class ProductController extends Controller
             return response()->json(
                 ProductResource::collection($products)
             );
-
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
@@ -55,6 +54,10 @@ class ProductController extends Controller
         try {
             $validated = $request->validated();
 
+            if (!is_array($validated['categories'])) {
+                $validated['categories'] = explode(',', $validated['categories']);
+            }
+
             $product = $model->create($validated);
 
             return response()->json([
@@ -62,11 +65,10 @@ class ProductController extends Controller
                 'message' => 'Product created successfully',
                 'product' => new ProductResource($product),
             ], Response::HTTP_CREATED);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to create product: '. $e->getMessage(),
+                'message' => 'Failed to create product: ' . $e->getMessage(),
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
     }

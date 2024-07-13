@@ -2,6 +2,7 @@ require('./bootstrap');
 
 import { createApp, onMounted, provide, ref } from 'vue';
 import ProductListing from './components/ProductListing';
+import AddProduct from './components/AddProduct.vue';
 
 const app = createApp({
     setup() {
@@ -23,5 +24,6 @@ const app = createApp({
 });
 
 app.component('product-listing', ProductListing)
+app.component('add-product', AddProduct)
 
 app.mount('#app');

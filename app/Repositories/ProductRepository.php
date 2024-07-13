@@ -22,7 +22,7 @@ class ProductRepository implements ProductRepositoryInterface
     {
         try {
             $query = Product::query();
-            
+
             if ($categoryId) {
                 $query->whereHas('categories', function ($q) use ($categoryId) {
                     $q->where('categories.id', $categoryId);
@@ -31,7 +31,7 @@ class ProductRepository implements ProductRepositoryInterface
 
             if ($sortDirection) {
                 $sortDirection = strtoupper($sortDirection);
-                if(!in_array($sortDirection, ['ASC', 'DESC'])) {
+                if (!in_array($sortDirection, ['ASC', 'DESC'])) {
                     $sortDirection = 'ASC';
                 }
                 // dd($query->orderBy('price', $sortDirection));

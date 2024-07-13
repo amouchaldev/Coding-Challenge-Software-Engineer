@@ -21,7 +21,7 @@ class CreateProduct extends Command
      * @var string
      */
     protected $description = 'Create a new product via CLI';
-    
+
     /**
      * categoryRepository
      *
@@ -64,7 +64,22 @@ class CreateProduct extends Command
     {
         return $this->categoryRepository->getAll()->pluck('name', 'id')->toArray();
     }
-    
+
+    protected function selectCategoryIds()
+    {
+        $categories = $this->getCategories();
+
+        $this->info('Available Categories:');
+
+        foreach ($categories as $id => $name) {
+            $this->line("ID: $id - Name: $name");
+        }
+
+        $selectedIds = $this->askRequired('Enter category IDs (comma-separated)');
+
+        return $selectedIds;
+    }
+
     private function gatherProductData(array $categories): array
     {
         return [
@@ -72,16 +87,14 @@ class CreateProduct extends Command
             'description' => $this->askRequired('description'),
             'price' => $this->askRequired('price'),
             'image' => $this->askRequired('image'),
-            'categories' => $this->ask('please enter categories id separate by comma: ')
-            // 'categories' => $this->choice('choose categories ids', $categories)
+            // 'categories' => $this->ask('please enter categories id separate by comma: ')
+            'categories' => $this->selectCategoryIds()
         ];
     }
-        
+
     private function sendCreateProductRequest(array $productData)
     {
         $imagePath = $productData['image'];
-
-        $categoryList = explode(',', trim($productData['categories']));
 
         $multipartData = [
             [
@@ -103,15 +116,15 @@ class CreateProduct extends Command
             ],
             [
                 'name'     => 'categories',
-                'contents' => $categoryList
+                'contents' => $productData['categories']
             ]
         ];
-        
+
         return Http::asMultipart()
-                    ->withHeaders(['Accept' => 'application/json'])
-                    ->post(url('/api/products'), $multipartData);
+            ->withHeaders(['Accept' => 'application/json'])
+            ->post(url('/api/products'), $multipartData);
     }
-    
+
     private function handleResponse($response)
     {
         if ($response->status() === 201) {
@@ -121,7 +134,7 @@ class CreateProduct extends Command
             $this->handleErrors($response->collect()['errors']);
         }
     }
-    
+
     private function handleErrors(array $errors)
     {
         foreach ($errors as $error) {
@@ -129,7 +142,7 @@ class CreateProduct extends Command
             $this->newLine();
         }
     }
-    
+
     private function askRequired(string $question): string
     {
         $response = '';
