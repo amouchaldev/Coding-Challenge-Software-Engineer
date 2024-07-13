@@ -21,10 +21,13 @@ class CreateProductTest extends TestCase
         ]);
     }
 
+    protected function getFakeImage()
+    {
+        return UploadedFile::fake()->image('product.jpg');
+    }
+
     public function test_create_product_api()
     {
-        Storage::fake('public');
-
         $image = UploadedFile::fake()->image('product.jpg');
 
         $payload = [
@@ -52,6 +55,19 @@ class CreateProductTest extends TestCase
         Storage::disk('public')->assertExists('products/' . $image->hashName());
     }
 
+    public function test_create_product_cli()
+    {
+        $image = $this->getFakeImage();
+
+        $this->artisan('product:create')
+            ->expectsQuestion('name', 'Test Product')
+            ->expectsQuestion('description', 'Test description')
+            ->expectsQuestion('price', 10.99)
+            ->expectsQuestion('image', $image->path())
+            ->expectsQuestion('Enter category IDs (comma-separated)', '1,2,3')
+            ->assertExitCode(0);
+    }
+
     public function test_product_creation_validation()
     {
         // Test with missing required fields
@@ -75,14 +91,14 @@ class CreateProductTest extends TestCase
             'name' => str_repeat('a', 256), // Exceeds max length
             'description' => 'Test description',
             'price' => 10.99,
-            'image' => UploadedFile::fake()->image('product.jpg'),
+            'image' => $this->getFakeImage(),
         ]);
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['name']);
 
         // Test with valid data
         Storage::fake('public');
-        $validImage = UploadedFile::fake()->image('product.jpg');
+        $validImage = $this->getFakeImage();
 
         $response = $this->postJson('/api/products', [
             'name' => 'Test Product',

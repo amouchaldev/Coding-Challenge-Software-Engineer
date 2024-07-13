@@ -55,6 +55,8 @@ class CreateProduct extends Command
             $response = $this->sendCreateProductRequest($productData);
 
             $this->handleResponse($response);
+
+            return 0;
         } catch (\Exception $e) {
             $this->error('Error: ' . $e->getMessage());
         }
