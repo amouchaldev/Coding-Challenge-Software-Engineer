@@ -1,5 +1,3 @@
-require('./bootstrap');
-
 import { createApp, onMounted, provide, ref } from 'vue';
 import ProductListing from './components/ProductListing';
 import AddProduct from './components/AddProduct.vue';

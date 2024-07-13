@@ -62,49 +62,45 @@ export default {
             image: null,
             categories: []
         });
-        // State for success and error messages
         const successMessage = ref('');
         const errorMessages = ref([]);
 
         const submitForm = async () => {
             try {
-                // Clear previous messages
                 successMessage.value = '';
                 errorMessages.value = [];
 
-                // FormData to handle file upload
                 const formData = new FormData();
                 formData.append('name', product.value.name);
                 formData.append('description', product.value.description);
                 formData.append('price', product.value.price);
                 formData.append('image', product.value.image);
                 product.value.categories.forEach(categoryId => {
-                formData.append('categories[]', categoryId);
+                    formData.append('categories[]', categoryId);
                 });
-                // API call to create the product
+
                 const response = await axios.post('/api/products', formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     }
                 });
 
-                if(response.status === 201) {
+                if (response.status === 201) {
                     successMessage.value = 'Product created successfully.';
                     resetForm();
                 }
+
             } catch (error) {
-                console.log(error)
                 if (error.response && error.response.status === 422) {
                     // Validation errors from Laravel validation
                     errorMessages.value = Object.values(error.response.data.errors).flat();
-                    console.log(Object.values(error.response.data.errors))
                 } else {
                     // General error handling
                     errorMessages.value = ['Failed to create product. Please try again later.'];
                 }
             }
         };
-        // Function to reset the form
+
         const resetForm = () => {
             product.value.name = '';
             product.value.description = '';
@@ -129,7 +125,3 @@ export default {
     }
 };
 </script>
-
-<style scoped>
-/* Add scoped styles here */
-</style>

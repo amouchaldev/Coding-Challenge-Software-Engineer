@@ -5,26 +5,16 @@
                 <div class="d-flex">
                     <div class="w-100 me-2">
                         <label for="sort">Sort by price:</label>
-                        <select
-                            v-model="sortOrder"
-                            class="form-control form-control-sm"
-                        >
+                        <select v-model="sortOrder" class="form-control form-control-sm">
                             <option value="asc">Ascending</option>
                             <option value="desc">Descending</option>
                         </select>
                     </div>
                     <div class="w-100">
                         <label for="category">Filter by category:</label>
-                        <select
-                            v-model="selectedCategory"
-                            class="form-control form-control-sm"
-                        >
+                        <select v-model="selectedCategory" class="form-control form-control-sm">
                             <option value="">All</option>
-                            <option
-                                v-for="category in categories"
-                                :key="category.id"
-                                :value="category.id"
-                            >
+                            <option v-for="category in categories" :key="category.id" :value="category.id">
                                 {{ category.name }}
                             </option>
                         </select>
@@ -45,25 +35,17 @@
             <tbody>
                 <tr v-for="product in products" :key="product.id">
                     <td class="align-middle">
-                        <img
-                            :src="product.thumbnail"
-                            :alt="product.name"
-                            class="img-thumbnail"
-                        />
+                        <img :src="product.thumbnail" :alt="product.name" class="img-thumbnail" />
                     </td>
                     <td class="align-middle">
-                      {{ product.name }}
-                      <br />
-                      <small class="opacity-75">{{ product.description }}</small>
+                        {{ product.name }}
+                        <br />
+                        <small class="opacity-75">{{ product.description }}</small>
                     </td>
                     <td class="align-middle">${{ product.price }}</td>
                     <td class="align-middle">
-                        <span
-                            v-for="category in product.categories"
-                            :key="category.id"
-                            class="badge bg-primary me-1"
-                            >{{ category.name }}</span
-                        >
+                        <span v-for="category in product.categories" :key="category.id" class="badge bg-primary me-1">{{
+                            category.name }}</span>
                     </td>
                 </tr>
             </tbody>
