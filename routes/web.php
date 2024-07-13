@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::group([
+    'as' => 'products.'
+], function () {
+    Route::view('/', 'products.index')->name('index');
+    Route::view('/products/create', 'products.create')->name('create');
 });
