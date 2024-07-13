@@ -5,7 +5,7 @@ This app efficiently manages products and categories, focusing on clean architec
 ## Features
 
 - **Product Management**
-    - Create products with attributes such as name, description, price, and image upload.
+    - Create products with attributes such as name, description, price, and image.
     - Assign products to multiple categories.
 
 
