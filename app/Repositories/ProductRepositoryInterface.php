@@ -1,9 +1,6 @@
 <?php
 
 namespace App\Repositories;
-namespace App\Repositories;
-
-use Illuminate\Database\Eloquent\Collection;
 
 interface ProductRepositoryInterface
 {

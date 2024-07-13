@@ -31,6 +31,7 @@ class ProductController extends Controller
             } else {
                 $products = $model->getAll();
             }
+            
             return response()->json(
                 ProductResource::collection($products)
             );

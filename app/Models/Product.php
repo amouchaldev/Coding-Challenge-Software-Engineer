@@ -10,10 +10,10 @@ class Product extends Model
     use HasFactory;
 
     protected $fillable = ['name', 'description', 'price', 'image'];
-    
+
     protected $hidden = ['pivot'];
 
-    public function categories() 
+    public function categories()
     {
         return $this->belongsToMany(Category::class);
     }

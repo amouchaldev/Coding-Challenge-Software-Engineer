@@ -8,10 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class Category extends Model
 {
     use HasFactory;
-    
+
     protected $hidden = ['pivot'];
 
-    public function products() 
+    public function products()
     {
         return $this->belongsToMany(Category::class);
     }

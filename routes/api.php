@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::group([
-    'prefix' => 'products', 
+    'prefix' => 'products',
     'controller' => ProductController::class
 ], function () {
     Route::get('/', 'index');
