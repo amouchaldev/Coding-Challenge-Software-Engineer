@@ -6,18 +6,19 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductRequest;
 use App\Http\Resources\ProductResource;
 use App\Repositories\ProductRepository;
-use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Exception;
 
 class ProductController extends Controller
 {
     /**
      * index
      *
-     * @param  mixed $request
-     * @param  mixed $model
+     * @param  Request $request
+     * @param  ProductRepository $model
      * @return JsonResponse
      */
     public function index(Request $request, ProductRepository $model): JsonResponse
@@ -26,15 +27,16 @@ class ProductController extends Controller
             $sortDirection = $request->query('sort');
             $categoryId = $request->query('category');
 
-            if ($sortDirection || $categoryId) {
-                $products = $model->getAllSortedAndFiltered($sortDirection, $categoryId);
-            } else {
-                $products = $model->getAll();
-            }
-            
-            return response()->json(
-                ProductResource::collection($products)
-            );
+            $products = $sortDirection || $categoryId 
+                ? $model->getAllSortedAndFiltered($sortDirection, $categoryId)
+                : $model->getAll();
+
+            return response()->json(ProductResource::collection($products));
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Products not found: ' . $e->getMessage(),
+            ], Response::HTTP_NOT_FOUND);
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
@@ -46,8 +48,8 @@ class ProductController extends Controller
     /**
      * store
      *
-     * @param  mixed $request
-     * @param  mixed $model
+     * @param  ProductRequest $request
+     * @param  ProductRepository $model
      * @return JsonResponse
      */
     public function store(ProductRequest $request, ProductRepository $model): JsonResponse
@@ -62,11 +64,11 @@ class ProductController extends Controller
             $product = $model->create($validated);
 
             return response()->json([
-                'success'  => true,
+                'success' => true,
                 'message' => 'Product created successfully',
                 'product' => new ProductResource($product),
             ], Response::HTTP_CREATED);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to create product: ' . $e->getMessage(),
