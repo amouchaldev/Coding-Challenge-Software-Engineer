@@ -54,24 +54,30 @@
 </template>
 
 <script>
-import axios from "axios";
-import { ref, onMounted, watch, inject } from "vue";
+
+import { ref, watch, onMounted, inject } from 'vue';
+import axios from 'axios';
 
 export default {
     setup() {
-        const categories = inject("categories"); // Inject the categories from the app setup
         const products = ref([]);
         const sortOrder = ref("");
         const selectedCategory = ref("");
 
+        const categories = inject("categories");
+
         const fetchProducts = async () => {
-            const response = await axios.get("/api/products", {
-                params: {
-                    category: selectedCategory.value,
-                    sort: sortOrder.value,
-                },
-            });
-            products.value = response.data;
+            try {
+                const response = await axios.get("/api/products", {
+                    params: {
+                        category: selectedCategory.value,
+                        sort: sortOrder.value,
+                    },
+                });
+                products.value = response.data;
+            } catch (error) {
+                console.error('Error fetching products:', error);
+            }
         };
 
         watch([selectedCategory, sortOrder], () => {
@@ -89,6 +95,7 @@ export default {
         };
     },
 };
+
 </script>
 
 <style scoped>
