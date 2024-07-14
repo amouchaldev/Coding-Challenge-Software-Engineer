@@ -48,6 +48,7 @@ class ProductRepository implements ProductRepositoryInterface
     {
         return DB::transaction(function () use ($attributes) {
             $product = Product::make($attributes);
+            
             if (isset($attributes['image']) && file_exists($attributes['image'])) {
                 $product->image = Storage::disk('public')->put('products', $attributes['image']);
             } else {
