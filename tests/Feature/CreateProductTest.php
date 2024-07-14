@@ -63,7 +63,7 @@ class CreateProductTest extends TestCase
             ->expectsQuestion('name', 'Test Product')
             ->expectsQuestion('description', 'Test description')
             ->expectsQuestion('price', 10.99)
-            ->expectsQuestion('image', $image->path(r))
+            ->expectsQuestion('image', $image->path())
             ->expectsQuestion('Enter category IDs (comma-separated)', '1,2,3')
             ->assertExitCode(0);
     }
