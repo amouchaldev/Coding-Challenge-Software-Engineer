@@ -1,16 +1,12 @@
 # Product Management Application
 
-This app efficiently manages products and categories, focusing on clean architecture and software engineering principles.
+This app manages products, focusing on clean architecture and software engineering principles.
 
 ## Features
 
-- **Product Management**
-    - Create products with attributes such as name, description, price, and image.
-    - Assign products to multiple categories.
-
-
-- **Listing and Filtering**
-    - A listing of products with the ability to sort by price, or/and filter by a category.
+- Create products with attributes such as name, description, price, and image.
+- Assign products to multiple categories.
+- A listing of products with the ability to sort by price, or/and filter by a category.
 
 ## Technologies Used
 
@@ -38,20 +34,20 @@ This app efficiently manages products and categories, focusing on clean architec
   php artisan key:generate
   ```
 
-6. **Database Setup:**
+5. **Database Setup:**
 - Run migrations with seed data:
 
   ```
   php artisan migrate --seed
   ```
   
-7. **Compiling Assets:**
+6. **Compiling Assets:**
 - During development, compile assets using:
 
     ```
     npm run dev
     ```
-8. **Create Symbolic Link for Storage:**
+7. **Create Symbolic Link for Storage:**
 
     ```
     php artisan storage:link
@@ -75,8 +71,8 @@ This app efficiently manages products and categories, focusing on clean architec
     php artisan serve
     ```
 
-    1. Access the application via your web browser.
-    2. Utilize the interface for listing or creating products.
+1. Access the application via your web browser.
+2. Utilize the interface for listing or creating products.
 
 
 ### Command Line Interface (CLI)
