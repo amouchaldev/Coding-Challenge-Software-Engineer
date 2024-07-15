@@ -2,9 +2,12 @@
 
 namespace App\Console\Commands;
 
+use App\Http\Requests\ProductRequest;
 use App\Repositories\CategoryRepository;
+use App\Services\ProductService;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Validator;
+use Throwable;
 
 class CreateProduct extends Command
 {
@@ -22,22 +25,21 @@ class CreateProduct extends Command
      */
     protected $description = 'Create a new product via CLI';
 
-    /**
-     * categoryRepository
-     *
-     * @var mixed
-     */
     private $categoryRepository;
 
+    private $productService;
+
+
     /**
-     * Create a new command instance.
      *
      * @return void
      */
-    public function __construct(CategoryRepository $categoryRepository)
+    public function __construct(CategoryRepository $categoryRepository, ProductService $productService)
     {
         parent::__construct();
+
         $this->categoryRepository = $categoryRepository;
+        $this->productService = $productService;
     }
 
     /**
@@ -45,29 +47,57 @@ class CreateProduct extends Command
      *
      * @return int
      */
-    public function handle()
+    public function handle(): int
     {
         try {
-            $categories = $this->getCategories();
-            // dd($categories);
-            $productData = $this->gatherProductData($categories);
+            $productData = $this->gatherProductData();
 
-            $response = $this->sendCreateProductRequest($productData);
+            $validatedData = $this->validateInput($productData);
 
-            $this->handleResponse($response);
+            $product = $this->productService->createProduct($validatedData);
 
+            $this->info('product created successfully with id: ' . $product->id);
+
+            return 1;
+        } catch (Throwable) {
+            $this->error('failed to create the product');
             return 0;
-        } catch (\Exception $e) {
-            $this->error('Error: ' . $e->getMessage());
         }
     }
 
+    /**
+     * validateInput
+     *
+     * @param  array $inputData
+     * @return array
+     */
+    private function validateInput(array $inputData): array
+    {
+        $validator = Validator::make($inputData, (new ProductRequest())->rules());
+
+        if ($validator->fails()) {
+            $this->showErrors($validator->errors()->all());
+        }
+
+        return $inputData;
+    }
+
+    /**
+     * getCategories
+     *
+     * @return array
+     */
     private function getCategories(): array
     {
         return $this->categoryRepository->getAll()->pluck('name', 'id')->toArray();
     }
 
-    protected function selectCategoryIds()
+    /**
+     * selectCategoryIds
+     *
+     * @return string
+     */
+    protected function selectCategoryIds(): string
     {
         $categories = $this->getCategories();
 
@@ -82,7 +112,12 @@ class CreateProduct extends Command
         return $selectedIds;
     }
 
-    private function gatherProductData(array $categories): array
+    /**
+     * gatherProductData
+     *
+     * @return array
+     */
+    private function gatherProductData(): array
     {
         return [
             'name' => $this->askRequired('name'),
@@ -94,57 +129,26 @@ class CreateProduct extends Command
         ];
     }
 
-    private function sendCreateProductRequest(array $productData)
-    {
-        $imagePath = $productData['image'];
-
-        $multipartData = [
-            [
-                'name'     => 'name',
-                'contents' => $productData['name']
-            ],
-            [
-                'name'     => 'description',
-                'contents' => $productData['description']
-            ],
-            [
-                'name'     => 'price',
-                'contents' => $productData['price']
-            ],
-            [
-                'name'     => 'image',
-                'contents' => fopen($imagePath, 'r'),
-                'filename' => basename($imagePath)
-            ],
-            [
-                'name'     => 'categories',
-                'contents' => $productData['categories']
-            ]
-        ];
-
-        return Http::asMultipart()
-            ->withHeaders(['Accept' => 'application/json'])
-            ->post(url('/api/products'), $multipartData);
-    }
-
-    private function handleResponse($response)
-    {
-        if ($response->status() === 201) {
-            $this->info('Product created successfully');
-        } else {
-            $this->warn('Failed to create product. Status Code: ' . $response->status());
-            $this->handleErrors($response->collect()['errors']);
-        }
-    }
-
-    private function handleErrors(array $errors)
+    /**
+     * showErrors
+     *
+     * @param  array $errors
+     * @return void
+     */
+    private function showErrors(array $errors): void
     {
         foreach ($errors as $error) {
-            $this->error($error[0]);
+            $this->error($error);
             $this->newLine();
         }
     }
 
+    /**
+     * askRequired
+     *
+     * @param  string $question
+     * @return string
+     */
     private function askRequired(string $question): string
     {
         $response = '';
