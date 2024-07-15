@@ -6,41 +6,60 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductRequest;
 use App\Http\Resources\ProductResource;
 use App\Repositories\ProductRepository;
+use App\Services\ProductService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Exception;
+use Throwable;
 
 class ProductController extends Controller
 {
+    private $productRepository;
+
+    private $productService;
+
+    /**
+     * Create a new controller instance.
+     *
+     * @param  ProductRepository  $productRepository
+     * @param  ProductService  $productService
+     * @return void
+     */
+    public function __construct(ProductRepository $productRepository, ProductService $productService)
+    {
+        $this->productRepository = $productRepository;
+        $this->productService = $productService;
+    }
+
     /**
      * index
      *
      * @param  Request $request
-     * @param  ProductRepository $model
      * @return JsonResponse
      */
-    public function index(Request $request, ProductRepository $model): JsonResponse
+    public function index(Request $request): JsonResponse
     {
         try {
             $sortDirection = $request->query('sort');
             $categoryId = $request->query('category');
 
-            $products = $sortDirection || $categoryId 
-                ? $model->getAllSortedAndFiltered($sortDirection, $categoryId)
-                : $model->getAll();
+            $products = $sortDirection || $categoryId
+                ? $this->productRepository->getAllSortedAndFiltered($sortDirection, $categoryId)
+                : $this->productRepository->getAll();
+
+            $products->load('categories:id,name');
 
             return response()->json(ProductResource::collection($products));
-        } catch (ModelNotFoundException $e) {
+        } catch (ModelNotFoundException) {
             return response()->json([
                 'success' => false,
-                'message' => 'Products not found: ' . $e->getMessage(),
+                'message' => 'Products not found',
             ], Response::HTTP_NOT_FOUND);
-        } catch (Exception $e) {
+        } catch (Throwable) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error fetching products: ' . $e->getMessage(),
+                'message' => 'Error fetching products',
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -49,29 +68,24 @@ class ProductController extends Controller
      * store
      *
      * @param  ProductRequest $request
-     * @param  ProductRepository $model
      * @return JsonResponse
      */
-    public function store(ProductRequest $request, ProductRepository $model): JsonResponse
+    public function store(ProductRequest $request): JsonResponse
     {
         try {
             $validated = $request->validated();
 
-            if (isset($validated['categories']) && !is_array($validated['categories'])) {
-                $validated['categories'] = explode(',', $validated['categories']);
-            }
-
-            $product = $model->create($validated);
+            $product = $this->productService->createProduct($validated);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Product created successfully',
                 'product' => new ProductResource($product),
             ], Response::HTTP_CREATED);
-        } catch (Exception $e) {
+        } catch (Throwable) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to create product: ' . $e->getMessage(),
+                'message' => 'Failed to create product',
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
     }

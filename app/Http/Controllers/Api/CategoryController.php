@@ -12,11 +12,11 @@ class CategoryController extends Controller
     /**
      * __invoke
      *
-     * @param  mixed $model
+     * @param  CategoryRepository $categoryRepository
      * @return JsonResponse
      */
-    public function __invoke(CategoryRepository $model): JsonResponse
+    public function __invoke(CategoryRepository $categoryRepository): JsonResponse
     {
-        return response()->json(CategoryResource::collection($model->getAll()));
+        return response()->json(CategoryResource::collection($categoryRepository->getAll()));
     }
 }
