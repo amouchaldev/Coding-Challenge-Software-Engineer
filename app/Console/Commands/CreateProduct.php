@@ -11,6 +11,9 @@ use Throwable;
 
 class CreateProduct extends Command
 {
+    private const PRODUCT_CREATED_SUCCESS = 1;
+    private const PRODUCT_CREATION_FAILED = 0;
+
     /**
      * The name and signature of the console command.
      *
@@ -29,7 +32,6 @@ class CreateProduct extends Command
 
     private $productService;
 
-
     /**
      *
      * @return void
@@ -45,9 +47,9 @@ class CreateProduct extends Command
     /**
      * Execute the console command.
      *
-     * @return int
+     * @return bool
      */
-    public function handle(): int
+    public function handle(): bool
     {
         try {
             $productData = $this->gatherProductData();
@@ -58,10 +60,10 @@ class CreateProduct extends Command
 
             $this->info('product created successfully with id: ' . $product->id);
 
-            return 1;
+            return self::PRODUCT_CREATED_SUCCESS;
         } catch (Throwable) {
             $this->error('failed to create the product');
-            return 0;
+            return self::PRODUCT_CREATION_FAILED;
         }
     }
 
