@@ -2,7 +2,14 @@
 
 namespace App\Repositories;
 
+use Illuminate\Database\Eloquent\Collection;
+
 interface CategoryRepositoryInterface
-{
-    public function getAll();
+{    
+    /**
+     * getAll
+     *
+     * @return Collection
+     */
+    public function getAll(): Collection;
 }

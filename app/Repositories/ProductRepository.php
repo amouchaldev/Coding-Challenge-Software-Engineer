@@ -4,21 +4,27 @@ namespace App\Repositories;
 
 use App\Models\Product;
 use Exception;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
+use Throwable;
 
 class ProductRepository implements ProductRepositoryInterface
 {
-    public function getAll()
+    /**
+     * getAll
+     *
+     * @return Collection
+     */
+    public function getAll(): Collection
     {
         try {
-            return Product::with('categories:id,name')->get();
-        } catch (Exception $e) {
-            throw new Exception("Error fetching all products: " . $e->getMessage());
+            return Product::get();
+        } catch (Throwable) {
+            throw new Throwable("Error fetching all products");
         }
     }
 
-    public function getAllSortedAndFiltered(?string $sortDirection = null, ?int $categoryId = null)
+    public function getAllSortedAndFiltered(?string $sortDirection = null, ?int $categoryId = null): Collection
     {
         try {
             $query = Product::query();
@@ -34,31 +40,22 @@ class ProductRepository implements ProductRepositoryInterface
                 if (!in_array($sortDirection, ['ASC', 'DESC'])) {
                     $sortDirection = 'ASC';
                 }
-                // dd($query->orderBy('price', $sortDirection));
                 $query->orderBy('price', $sortDirection);
             }
 
             return $query->get();
-        } catch (Exception $e) {
-            throw new Exception("Error fetching sorted and filtered products: " . $e->getMessage());
+        } catch (Throwable) {
+            throw new Exception('Error fetching sorted and filtered products');
         }
     }
 
-    public function create(array $attributes)
+    public function create(array $attributes): Product
     {
         return DB::transaction(function () use ($attributes) {
-            $product = Product::make($attributes);
-            
-            if (isset($attributes['image']) && file_exists($attributes['image'])) {
-                $product->image = Storage::disk('public')->put('products', $attributes['image']);
-            } else {
-                throw new \Exception('Image file not found or invalid.');
-            }
-
-            $product->save();
+            $product = Product::create($attributes);
 
             if (!$product) {
-                throw new \Exception('Failed to create product');
+                throw new Exception('Failed to create product');
             }
 
             $categoryIds = data_get($attributes, 'categories');
